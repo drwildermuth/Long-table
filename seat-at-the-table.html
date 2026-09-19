@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A Seat at the Table — LIN 553</title>
+<style>
+  :root{
+    --red:#CB2026;
+    --red-dark:#8f1519;
+    --black:#1a1512;
+    --cream:#F6F0E6;
+    --cream-deep:#EDE3D2;
+    --line: rgba(26,21,18,0.14);
+    --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', serif;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--cream);color:var(--black);font-family:var(--sans);height:100%;}
+  body{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 60px;
+    padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+  .stage{width:100%;max-width:760px;padding:48px 28px;margin:0 auto;}
+  ::selection{background:var(--red);color:var(--cream);}
+
+  h1,h2,h3{font-family:var(--serif);font-weight:400;color:var(--black);margin:0 0 0.4em;}
+  h1{font-size:2.1rem;line-height:1.15;letter-spacing:-0.01em;}
+  h2{font-size:1.5rem;line-height:1.25;color:var(--red-dark);}
+  .eyebrow{font-family:var(--sans);text-transform:uppercase;letter-spacing:0.12em;font-size:0.72rem;
+    color:var(--red);font-weight:600;margin-bottom:10px;}
+  p{font-family:var(--serif);font-size:1.08rem;line-height:1.68;color:#2a231f;}
+  .ui-text{font-family:var(--sans);}
+  .fine{font-family:var(--sans);font-size:0.85rem;color:#5b5147;line-height:1.5;}
+
+  .scene{opacity:0;transform:translateY(10px);animation:fadeIn 0.55s ease forwards;}
+  @keyframes fadeIn{to{opacity:1;transform:translateY(0);}}
+  .card{background:var(--cream-deep);border:1px solid var(--line);border-radius:2px;padding:26px 26px;margin:20px 0;}
+  .divider{height:1px;background:var(--line);margin:30px 0;}
+
+  .choice{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);
+    border-radius:3px;padding:18px 20px;margin:12px 0;cursor:pointer;transition:border-color .18s, background .18s;
+    font-family:var(--serif);font-size:1rem;line-height:1.55;color:#2a231f;}
+  .choice:hover{border-color:var(--red);background:#fffaf6;}
+  .choice:focus-visible{outline:3px solid var(--red);outline-offset:2px;}
+  .choice .tag{display:block;font-family:var(--sans);text-transform:uppercase;letter-spacing:0.08em;
+    font-size:0.7rem;color:var(--red);font-weight:700;margin-bottom:8px;}
+
+  .btn{font-family:var(--sans);font-weight:600;font-size:0.95rem;border:none;border-radius:3px;
+    padding:13px 26px;cursor:pointer;transition:background .15s, transform .1s;}
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{background:var(--red);color:#fff;}
+  .btn-primary:hover{background:var(--red-dark);}
+  .btn-outline{background:transparent;color:var(--black);border:1.5px solid var(--black);}
+  .btn-outline:hover{background:var(--black);color:var(--cream);}
+  .btn-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px;}
+
+  input[type=text], textarea{font-family:var(--sans);font-size:1rem;width:100%;padding:12px 14px;
+    border:1.5px solid var(--line);border-radius:3px;background:#fff;color:var(--black);}
+  textarea{min-height:120px;resize:vertical;}
+  label.field-label{display:block;font-family:var(--sans);font-weight:600;font-size:0.85rem;
+    text-transform:uppercase;letter-spacing:0.06em;color:#5b5147;margin:18px 0 8px;}
+
+  .radio-row{display:block;background:#fff;border:1px solid var(--line);border-radius:3px;
+    padding:14px 16px;margin:8px 0;cursor:pointer;font-family:var(--sans);font-size:0.95rem;}
+  .radio-row:hover{border-color:var(--red);}
+  .radio-row input{margin-right:10px;}
+  .radio-row .desc{display:block;font-size:0.82rem;color:#5b5147;margin-top:4px;margin-left:24px;}
+
+  .progress{font-family:var(--sans);font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;
+    color:#8a8074;margin-bottom:6px;}
+
+  .caveat{font-family:var(--sans);font-size:0.85rem;background:#fff;border-left:3px solid var(--red);
+    padding:14px 16px;margin:18px 0;color:#3a332c;}
+
+  .hexwrap{display:flex;justify-content:center;margin:20px 0;overflow-x:auto;}
+  .recap-item{font-family:var(--sans);font-size:0.92rem;padding:10px 0;border-bottom:1px solid var(--line);}
+  .recap-item:last-child{border-bottom:none;}
+
+  .exploration-banner{position:sticky;top:env(safe-area-inset-top,0px);background:var(--black);color:var(--cream);
+    font-family:var(--sans);font-size:0.82rem;text-align:center;padding:9px;z-index:10;letter-spacing:0.02em;}
+
+  .name-title{font-family:var(--serif);font-size:2.6rem;color:var(--red);margin:0 0 6px;}
+
+  @media print{
+    body *{visibility:hidden;}
+    #printSummary, #printSummary *{visibility:visible;}
+    #printSummary{position:absolute;top:0;left:0;width:100%;padding:20px;}
+    .exploration-banner, .btn-row{display:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<div id="explorationBanner" class="exploration-banner" style="display:none;">
+  You're exploring a different path. Your original submission isn't affected.
+</div>
+
+<div class="stage" id="app"></div>
+<div id="printSummary" style="display:none;"></div>
+
+<script>
+/* ============================================================
+   A SEAT AT THE TABLE — branched leadership scenario, v2
+   LIN 553, Week 2 — Podsakoff six-dimension version
+   6 scored scenes, 3 balanced options each (18 slots / 6 dims = 3 each)
+   No per-choice reflection required; single after-prediction only.
+   ============================================================ */
+
+const DIMENSIONS = [
+  {key:'vision', label:'Vision', desc:'Identifying opportunities and painting a compelling picture of the future.'},
+  {key:'example', label:'Leading by Example', desc:'Leading by doing, not just telling — modeling the behavior you want to see.'},
+  {key:'group', label:'Fostering Group Goals', desc:'Building collaboration and a shared sense of "we" across the team.'},
+  {key:'performance', label:'High Performance Expectations', desc:'Expecting — and insisting on — excellent work.'},
+  {key:'support', label:'Individualized Support', desc:'Attending to people\u2019s personal feelings, needs, and circumstances.'},
+  {key:'stimulation', label:'Intellectual Stimulation', desc:'Challenging people to question assumptions and try new ideas.'}
+];
+const MAXSCORE = 6; // 3 scenes x 2 points, per dimension, evenly
+
+const SCENES = [
+{
+  id:'scene1', num:1, title:'The Gut Punch',
+  setup:`It takes eleven days. Every wedding, conference, and corporate gala on Long Table's calendar for the next four months cancels. Revenue drops by more than half almost overnight. Priya, your COO, sits across from you with the numbers open on her laptop and doesn't say anything at first. Someone has to tell the team. The question is how.`,
+  options:[
+    {dim:'vision', text:`Call an all-hands. Share the real numbers, then pivot fast to a rough picture of what recovery could look like — give people something to build toward, not just something to absorb.`,
+      consequence:`People sit up when you pivot to the future. But two people tell Priya afterward that moving toward hope this fast, before anyone had a moment to sit with the bad news, felt like skipping a step.`,
+      cost:`The room moved toward tomorrow before some people were ready to leave today behind.`},
+    {dim:'example', text:`Announce your own pay cut first, before anything else, so the team knows exactly what you're asking of yourself before you ask anything of them.`,
+      consequence:`The gesture lands — people mention it for weeks. But the meeting ends up spent reacting to you, not talking to each other, and the real planning conversation gets pushed to a second meeting.`,
+      cost:`The gesture became the story of the day, which meant the actual plan had to wait.`},
+    {dim:'group', text:`Skip the big company-wide announcement. Let Marcus's kitchen crew and Ray's setup team each talk it through on their own terms first, before anything is decided together.`,
+      consequence:`Real ideas surface in those smaller rooms that one big meeting would have missed. But it takes two extra days before everyone's working from the same facts, and rumors fill part of the gap.`,
+      cost:`Two days of inconsistent information circulated before the full picture was official.`}
+  ]
+},
+{
+  id:'scene2', num:2, title:'The Volunteer Question',
+  setup:`Layoffs would fix the math fastest. You don't want to do that. The real question is how to close the gap without them.`,
+  options:[
+    {dim:'performance', text:`Set a hard savings target and a Friday deadline. Ask each department lead to find their share and own how they get there — no exceptions.`,
+      consequence:`Every lead hits the number by Thursday — clean, fast, done. But one lead admits later he didn't really have room to negotiate for his team; he just made the math work because you asked him to.`,
+      cost:`The number got hit, but at least one team's "yes" wasn't really a free one.`},
+    {dim:'support', text:`Talk to people privately, one at a time, about what they can and can't personally absorb, and build the plan around individual circumstances.`,
+      consequence:`You learn things you wouldn't have otherwise — one person's situation is far more fragile than you assumed, another has more room than expected. The plan ends up genuinely fair. It also eats a full week of one-on-ones you don't really have time for.`,
+      cost:`A week of your calendar you didn't have to spare, right when you needed it most.`},
+    {dim:'stimulation', text:`Open it to the whole team as a real problem to solve together — ask for creative ideas beyond pay cuts (shared roles, adjusted hours) before deciding anything.`,
+      consequence:`Danae proposes a shared-role idea nobody had considered that saves real money without a single pay cut in her department. But two other departments come back with nothing usable, and you still have to make the harder call there anyway.`,
+      cost:`One genuinely good idea, and two departments where the open question mostly just cost time.`}
+  ]
+},
+{
+  id:'scene3', num:3, title:'The Bold Idea',
+  setup:`Weeks in, still bleeding. Danae, an event coordinator two years into the job, corners you after a call. She wants to convert part of the kitchen into small-batch meal kits for locked-down families — untested, resource-intensive, and it might fail outright.`,
+  options:[
+    {dim:'vision', text:`Back it publicly. Frame it as part of where Long Table is headed, and give Danae real authority to run it.`,
+      consequence:`Danae runs with it, energized by the trust. The first two weeks are rough — a batch gets thrown out — but by week three it's real revenue. Two other people privately wonder why their ideas never got this kind of backing.`,
+      cost:`Visible favoritism, even if it wasn't meant that way — other ideas now feel like they need your public blessing to matter.`},
+    {dim:'performance', text:`Approve it, but only with a hard 30-day checkpoint — clear metrics, clear criteria for pulling the plug if it's not working.`,
+      consequence:`The checkpoint keeps things honest — everyone knows what success looks like. But Danae later says the countdown made her play it safer in week two, right when the idea needed more risk-taking, not less.`,
+      cost:`The clarity of a metric quietly discouraged the boldness the idea actually needed.`},
+    {dim:'stimulation', text:`Before committing resources, ask others on the team to pressure-test and improve Danae's idea rather than deciding on it solo.`,
+      consequence:`The idea comes back sharper — Ray spots a routing problem, Marcus flags a sourcing issue nobody else would have caught. It ships better. But it takes ten days longer, and Danae mentions afterward it felt like her idea got picked apart before she'd even tried it.`,
+      cost:`A better plan, and a slower one — Danae didn't love watching it get workshopped before liftoff.`}
+  ]
+},
+{
+  id:'scene4', num:4, title:'The One Who Can\u2019t',
+  setup:`Marcus, your head chef of eleven years, comes to you: one of his kitchen staff, a single parent, can't absorb any cut without missing rent.`,
+  options:[
+    {dim:'example', text:`Personally cover the difference yourself, quietly, out of your own pocket — no company funds, no process.`,
+      consequence:`She's covered, no paperwork, no exposure. But it's your money solving what's really a company problem, and it's not something you can keep doing if this happens again.`,
+      cost:`A personal fix that doesn't scale — and can't be the real answer next time.`},
+    {dim:'support', text:`Set up a discreet, formal hardship fund that anyone in a similar spot can apply to.`,
+      consequence:`Four different people end up using the fund over the next two months, not just her. But she tells Marcus later that filling out a request, even a discreet one, was one of the more humbling parts of the whole stretch.`,
+      cost:`Asking for help stayed a formal, slightly exposing thing to do.`},
+    {dim:'group', text:`Ask Marcus's team directly, as a group, whether they'd be willing to informally redistribute a little of their own cuts to cover a teammate — let the team decide together.`,
+      consequence:`The team says yes, fast, and it costs nothing structurally — just a slightly bigger cut spread across people who could better absorb it. But now the whole crew knows exactly who needed the help.`,
+      cost:`It worked, but her situation is no longer really private among her own crew.`}
+  ]
+},
+{
+  id:'scene5', num:5, title:'The Test',
+  setup:`A regional hotel chain calls Friday afternoon: they need a full banquet setup for two hundred people by Monday morning, no advance notice, or the contract goes elsewhere.`,
+  options:[
+    {dim:'vision', text:`Frame it to the team as proof of what Long Table is becoming — the future you've been describing, happening right now.`,
+      consequence:`The framing lands — people talk about that weekend with real pride afterward. But it also means the actual execution problems (a late delivery, a mixed-up floor plan) get glossed over in the story, and nobody stops to fix what went wrong.`,
+      cost:`The narrative outran the debrief — real hiccups never got named or fixed.`},
+    {dim:'group', text:`Let Marcus, Ray, and Danae self-organize the response as a team, and stay out of the room while they figure it out.`,
+      consequence:`They pull it off, and something shifts — they trust each other's judgment more afterward, not just yours. But it's genuinely stressful without you in the room, and Ray says afterward he wasn't sure backup existed if it went sideways.`,
+      cost:`It worked, but they weren't sure you had their back if it hadn't.`},
+    {dim:'performance', text:`Step in and run point yourself — assign tasks, set the timeline, hold people to it directly.`,
+      consequence:`It runs like clockwork — every task assigned, every deadline hit. But Danae mentions afterward that nobody got to use their own judgment about anything; you ran it the way you would have run it alone, just with more hands.`,
+      cost:`Flawless execution, and not really their weekend — yours.`}
+  ]
+},
+{
+  id:'scene6', num:6, title:'Paying It Back',
+  setup:`Revenue has recovered. It's time to decide how — or whether — to acknowledge what people gave up.`,
+  options:[
+    {dim:'example', text:`Personally thank and repay people one-on-one, in person, specific to what each person gave up — no group announcement.`,
+      consequence:`The one-on-ones land deeply — several people say it was the most seen they'd felt all year. But it takes three full weeks to get through everyone, and a couple of people find out, from a colleague, that they were near the end of the list.`,
+      cost:`Deeply personal, and slow enough that a couple of people noticed exactly where they fell in line.`},
+    {dim:'support', text:`Set individualized repayment amounts based on documented hardship, reviewed privately and case by case.`,
+      consequence:`It's precise and genuinely fair on paper. But "documented hardship" means people have to explain, in writing, what they went through to be repaid for it — and a couple of people say that stung more than the original sacrifice did.`,
+      cost:`Fairness required people to put their hardship in writing to be believed.`},
+    {dim:'stimulation', text:`Ask the team, as a group discussion, to help design what "paying it back" should even look like — let them define fair.`,
+      consequence:`The team lands on something better and more creative than you'd have designed alone — a mix of cash, time off, and recognition. But the discussion takes real time, and a couple of quieter people say their input got a little lost in the debate.`,
+      cost:`A better answer, reached in a way that worked less well for the quieter people in the room.`}
+  ]
+}
+];
+
+let state = {
+  name:'',
+  scores:{vision:0, example:0, group:0, performance:0, support:0, stimulation:0},
+  choiceLog:[],
+  sceneIndex:0,
+  predictBefore:null,
+  predictAfter:'',
+  ending:null,
+  exploration:false,
+  step:'title'
+};
+
+function resetForReplay(){
+  state.scores = {vision:0, example:0, group:0, performance:0, support:0, stimulation:0};
+  state.choiceLog = [];
+  state.sceneIndex = 0;
+  state.predictAfter = '';
+  state.ending = null;
+  state.exploration = true;
+  document.getElementById('explorationBanner').style.display = 'block';
+  goTo('scene');
+}
+
+function dimensionReferenceHTML(){
+  return `<div class="card">
+    <p class="eyebrow" style="margin-bottom:10px;">Quick reference &mdash; the six dimensions</p>
+    ${DIMENSIONS.map(d=>`<p class="ui-text" style="margin:6px 0;"><strong>${d.label}:</strong> ${d.desc}</p>`).join('')}
+  </div>`;
+}
+
+const app = document.getElementById('app');
+function render(html){
+  app.innerHTML = `<div class="scene">${html}</div>`;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function goTo(step){
+  state.step = step;
+  const fn = SCREENS[step];
+  if(fn) fn();
+}
+
+/* ---------------- TITLE ---------------- */
+function screenTitle(){
+  render(`
+    <p class="eyebrow">LIN 553 &middot; Week 2 Studio Deliverable</p>
+    <h1 class="name-title">A Seat at the Table</h1>
+    <p>You are Jordan Reyes, CEO and co-founder of Long Table Events &amp; Catering. Over the next six decisions,
+    a crisis is going to force real leadership choices &mdash; none of them clean, and none of them obviously right.</p>
+    <div class="card">
+      <p class="fine">This scenario draws on real events in business history, reshaped and combined with other sources
+      for educational use. Names, companies, and specific details have been changed or invented, and no scene should
+      be read as a depiction of any actual person or organization.</p>
+    </div>
+    <label class="field-label" for="studentName">Your name (for your downloaded submission)</label>
+    <input type="text" id="studentName" placeholder="Type your name">
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="submitName()">Begin</button>
+    </div>
+  `);
+}
+function submitName(){
+  const val = document.getElementById('studentName').value.trim();
+  state.name = val || 'Student';
+  goTo('predictBefore');
+}
+
+/* ---------------- PREDICT BEFORE ---------------- */
+function screenPredictBefore(){
+  const options = DIMENSIONS.map(d => `
+    <label class="radio-row">
+      <input type="radio" name="predictBefore" value="${d.key}">
+      <strong>${d.label}</strong>
+      <span class="desc">${d.desc}</span>
+    </label>
+  `).join('');
+  render(`
+    <p class="eyebrow">Before you begin</p>
+    <h2>In general, which of these is your strongest?</h2>
+    <p>Think about how you actually tend to lead \u2014 not the ideal version of yourself. There's no right answer here;
+    you'll come back to this after the scenario.</p>
+    ${options}
+    <div class="btn-row"><button class="btn btn-primary" onclick="submitPredictBefore()">Continue</button></div>
+  `);
+}
+function submitPredictBefore(){
+  const sel = document.querySelector('input[name=predictBefore]:checked');
+  if(!sel){ alert('Please select one option to continue.'); return; }
+  state.predictBefore = sel.value;
+  goTo('scene');
+}
+
+/* ---------------- SCENE (data-driven) ---------------- */
+function screenScene(){
+  const s = SCENES[state.sceneIndex];
+  const optHtml = s.options.map((o,i)=>`
+    <button class="choice" onclick="chooseOption(${i})">
+      ${o.text}
+    </button>
+  `).join('');
+  render(`
+    <p class="progress">Scene ${s.num} of ${SCENES.length}</p>
+    <h2>${s.title}</h2>
+    <p>${s.setup}</p>
+    ${optHtml}
+  `);
+}
+function chooseOption(i){
+  const s = SCENES[state.sceneIndex];
+  const o = s.options[i];
+  state.scores[o.dim] += 2;
+  state.choiceLog.push({scene:s.title, text:o.text, dim:o.dim, consequence:o.consequence, cost:o.cost});
+  render(`
+    <p class="eyebrow">What happened next</p>
+    <div class="card"><p>${o.consequence}</p></div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="advanceScene()">Continue</button></div>
+  `);
+}
+function advanceScene(){
+  state.sceneIndex++;
+  if(state.sceneIndex < SCENES.length){
+    goTo('scene');
+  } else {
+    goTo('ending');
+  }
+}
+
+/* ---------------- ENDING ---------------- */
+function topDimensions(){
+  return Object.entries(state.scores).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
+}
+function screenEnding(){
+  const top2 = topDimensions().slice(0,2);
+  let title, text;
+  if(top2.includes('group') && top2.includes('support')){
+    title = 'They followed you into the fire \u2014 and now they expect to be asked.';
+    text = `Long Table came out the other side leaner but close-knit. People trust each other more than they did in
+      January, and that trust wasn't free: decisions took longer because you kept bringing people in on them, and
+      Danae mentions, half-joking, that nothing moves fast around here anymore without a group conversation first.
+      The team that walked through this with you is more itself than before. Whether that team can move quickly
+      when speed actually matters is something you haven't had to test yet.`;
+  } else if(top2.includes('vision') && top2.includes('stimulation')){
+    title = 'Big things are happening, and a few people are catching their breath.';
+    text = `The meal-kit pivot outlives the crisis that started it and becomes a real second line of business. New
+      ideas keep surfacing, and the company feels genuinely different than it did in January \u2014 sharper, more
+      willing to try things. But Marcus, quieter these last few months, mentions once that he sometimes misses when
+      things just ran, instead of constantly being reinvented. Momentum carried the company forward. Not everyone
+      is sure they got to catch their breath.`;
+  } else if(top2.includes('performance') && top2.includes('example')){
+    title = 'The numbers came back on schedule. The people came back quieter.';
+    text = `By every metric that shows up in a board deck, this was a success: no layoffs, revenue recovered, every
+      deadline hit along the way. You set a high bar and met it yourself, visibly, every time. But Marcus, who
+      never once complained through any of it, mentions in passing that he's not sure anyone ever actually asked
+      him how the last few months felt \u2014 only whether the work got done. You got the outcome you were aiming
+      for. What it cost the people who delivered it is a quieter question.`;
+  } else {
+    title = 'Nothing about this was clean, but it held.';
+    text = `There's no tidy lesson here. The company survived on a mix of hard calls and small kindnesses that
+      didn't always point the same direction. A couple of relationships never fully went back to how they were
+      before; most did. Some choices here you'd make again without hesitation. Others you can already see the
+      cost of, in hindsight, even knowing you'd probably make the same call again. That's probably the most honest
+      outcome a story like this one produces.`;
+  }
+  state.ending = {title, text};
+  const costList = state.choiceLog.map(c => `<li class="recap-item"><strong>${c.scene}:</strong> ${c.cost}</li>`).join('');
+  render(`
+    <p class="progress">Ending</p>
+    <h2>${title}</h2>
+    <p>${text}</p>
+    <div class="card">
+      <p class="eyebrow" style="margin-bottom:10px;">What this path cost you</p>
+      <ul style="margin:0;padding-left:0;list-style:none;">${costList}</ul>
+    </div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="goTo('recap')">See all your choices</button></div>
+  `);
+}
+
+/* ---------------- RECAP (read-only, no writing required) ---------------- */
+function screenRecap(){
+  const items = state.choiceLog.map(c => `
+    <div class="card">
+      <p class="eyebrow" style="margin-bottom:6px;">${c.scene}</p>
+      <p class="ui-text" style="margin:0 0 10px;"><strong>What you chose:</strong> ${c.text}</p>
+      <p class="ui-text" style="margin:0;color:#5b5147;"><strong>What happened:</strong> ${c.consequence}</p>
+    </div>
+  `).join('');
+  render(`
+    <p class="eyebrow">Before you reflect</p>
+    <h2>Here's everything you chose</h2>
+    <p>A quick read-back \u2014 no writing needed here. Use it to think about which choice you're most likely to
+    reference in the next step.</p>
+    ${items}
+    <div class="btn-row"><button class="btn btn-primary" onclick="goTo('predictAfter')">Continue to reflection</button></div>
+  `);
+}
+
+/* ---------------- PREDICT AFTER ---------------- */
+function screenPredictAfter(){
+  render(`
+    <p class="eyebrow">Now that it's over</p>
+    <h2>In this scenario, which did you rely on most \u2014 and why?</h2>
+    ${dimensionReferenceHTML()}
+    <p>Write a few sentences. Be specific about which choice you're thinking of.</p>
+    <textarea id="predictAfterText" placeholder="I think I relied most on...">${state.predictAfter}</textarea>
+    <div class="btn-row"><button class="btn btn-primary" onclick="submitPredictAfter()">See my pattern</button></div>
+  `);
+}
+function submitPredictAfter(){
+  const val = document.getElementById('predictAfterText').value.trim();
+  if(!val){ alert('Please write a short reflection to continue.'); return; }
+  state.predictAfter = val;
+  goTo('reveal');
+}
+
+/* ---------------- HEXAGON DRAWING ---------------- */
+const LABEL_LINES = {
+  vision: ['Vision'],
+  example: ['Leading by', 'Example'],
+  group: ['Fostering', 'Group Goals'],
+  performance: ['High Performance', 'Expectations'],
+  support: ['Individualized', 'Support'],
+  stimulation: ['Intellectual', 'Stimulation']
+};
+function buildHexSVG(scores, size=300){
+  const padX = 100, padY = 46;
+  const totalW = size + padX*2;
+  const totalH = size + padY*2;
+  const cx = totalW/2, cy = totalH/2;
+  const r = size*0.33;
+  const n = DIMENSIONS.length;
+  const angle = (i) => (Math.PI/2) + (2*Math.PI*i/n) * -1;
+  const pt = (i, frac) => {
+    const a = angle(i);
+    return [cx + Math.cos(a)*r*frac, cy - Math.sin(a)*r*frac];
+  };
+  let rings = '';
+  [0.25,0.5,0.75,1].forEach(frac=>{
+    let pts=[];
+    for(let i=0;i<n;i++){ pts.push(pt(i,frac).join(',')); }
+    rings += `<polygon points="${pts.join(' ')}" fill="none" stroke="rgba(26,21,18,0.18)" stroke-width="1"/>`;
+  });
+  let axes = '', labels='';
+  for(let i=0;i<n;i++){
+    const [x,y] = pt(i,1);
+    axes += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(26,21,18,0.18)" stroke-width="1"/>`;
+    const [lx,ly] = pt(i,1.32);
+    const lines = LABEL_LINES[DIMENSIONS[i].key];
+    const startDy = lines.length > 1 ? -6 : 0;
+    labels += `<text x="${lx}" y="${ly}" font-size="11" font-family="Inter, sans-serif" fill="#3a332c"
+      text-anchor="middle"><tspan x="${lx}" dy="${startDy}">${lines[0]}</tspan>${lines.slice(1).map(ln=>`<tspan x="${lx}" dy="12">${ln}</tspan>`).join('')}</text>`;
+  }
+  let dataPts = [];
+  for(let i=0;i<n;i++){
+    const key = DIMENSIONS[i].key;
+    const frac = Math.max(0, Math.min(1, scores[key]/MAXSCORE));
+    dataPts.push(pt(i,frac).join(','));
+  }
+  const dataPoly = `<polygon points="${dataPts.join(' ')}" fill="rgba(203,32,38,0.28)" stroke="#CB2026" stroke-width="2.5"/>`;
+  const dots = dataPts.map(p=>{
+    const [x,y]=p.split(',');
+    return `<circle cx="${x}" cy="${y}" r="3.5" fill="#CB2026"/>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}"
+    style="max-width:100%;height:auto;" xmlns="http://www.w3.org/2000/svg">
+    ${rings}${axes}${dataPoly}${dots}${labels}
+  </svg>`;
+}
+
+/* ---------------- REVEAL ---------------- */
+function escapeHtml(s){
+  return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function screenReveal(){
+  const hex = buildHexSVG(state.scores, 300);
+  const predBeforeLabel = DIMENSIONS.find(d=>d.key===state.predictBefore).label;
+  render(`
+    <p class="eyebrow">Your pattern</p>
+    <h2>Here's what your choices actually show</h2>
+    <div class="hexwrap">${hex}</div>
+    <div class="caveat">
+      This reflects patterns in the choices you made within this fictional scenario, not a validated
+      psychological measurement. It's a mirror, not a score.
+    </div>
+    <p class="ui-text"><strong>You predicted (before):</strong> ${predBeforeLabel}</p>
+    <p class="ui-text"><strong>You said (after):</strong> "${escapeHtml(state.predictAfter)}"</p>
+    <div class="btn-row"><button class="btn btn-primary" onclick="goTo('download')">Continue to download</button></div>
+  `);
+}
+
+/* ---------------- DOWNLOAD / SUBMISSION SCREEN ---------------- */
+function screenDownload(){
+  render(`
+    <p class="eyebrow">${state.exploration ? 'Exploration run' : 'Your submission'}</p>
+    <h2>Download your results</h2>
+    <p>This prints (or saves as PDF) a full record: every choice you made, your reflection, your ending, and your
+    hexagon.</p>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="exportPDF()">Download / Print as PDF</button>
+      <button class="btn btn-outline" onclick="resetForReplay()">Try a Different Path</button>
+    </div>
+    ${state.exploration ? '<p class="fine">You are in exploration mode. Your original submission, if you downloaded one earlier, is unaffected.</p>' : ''}
+  `);
+}
+
+/* ---------------- PDF EXPORT (print-based) ---------------- */
+function exportPDF(){
+  const hex = buildHexSVG(state.scores, 260);
+  const choicesHtml = state.choiceLog.map(c => `
+    <div style="margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #ddd;">
+      <strong>${c.scene}</strong><br>
+      <strong>Chose:</strong> ${c.text}<br>
+      <span style="font-size:0.85em;color:#555;">Dimension: ${DIMENSIONS.find(d=>d.key===c.dim).label}</span><br>
+      <span style="font-size:0.9em;"><strong>What happened:</strong> ${c.consequence || ''}</span><br>
+      <span style="font-size:0.9em;"><strong>Cost:</strong> ${c.cost || ''}</span>
+    </div>
+  `).join('');
+  const predBeforeLabel = DIMENSIONS.find(d=>d.key===state.predictBefore).label;
+  document.getElementById('printSummary').innerHTML = `
+    <div style="font-family:Georgia,serif;color:#1a1512;max-width:680px;">
+      <h1 style="font-family:Georgia,serif;color:#CB2026;">A Seat at the Table \u2014 Results</h1>
+      <p><strong>Name:</strong> ${escapeHtml(state.name)}</p>
+      <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+      <p><strong>Mode:</strong> ${state.exploration ? 'Exploration (not for submission)' : 'Original submission'}</p>
+      <h2 style="color:#CB2026;">Predicted before: ${predBeforeLabel}</h2>
+      <h2 style="color:#CB2026;">Your choices</h2>
+      ${choicesHtml}
+      <h2 style="color:#CB2026;">Your ending</h2>
+      <p><strong>${state.ending ? state.ending.title : ''}</strong><br>${state.ending ? state.ending.text : ''}</p>
+      <h2 style="color:#CB2026;">Reflection (after)</h2>
+      <p>${escapeHtml(state.predictAfter)}</p>
+      <h2 style="color:#CB2026;">Your pattern</h2>
+      ${hex}
+      <p style="font-size:0.85em;color:#555;">This reflects patterns in the choices made within this fictional
+      scenario, not a validated psychological measurement.</p>
+    </div>
+  `;
+  document.getElementById('printSummary').style.display = 'block';
+  window.print();
+  document.getElementById('printSummary').style.display = 'none';
+}
+
+/* ---------------- SCREEN ROUTER ---------------- */
+const SCREENS = {
+  title: screenTitle,
+  predictBefore: screenPredictBefore,
+  scene: screenScene,
+  ending: screenEnding,
+  recap: screenRecap,
+  predictAfter: screenPredictAfter,
+  reveal: screenReveal,
+  download: screenDownload
+};
+
+goTo('title');
+</script>
+</body>
+</html>
